@@ -1,0 +1,11 @@
+# Utiliser l'image officielle PHP-FPM comme base pour le container
+FROM php:8.1-fpm
+
+# Définir le répertoire de travail à l'intérieur du container
+WORKDIR /app
+
+# Copier le fichier index.php dans le répertoire de travail spécifié
+COPY index.php .
+
+# Appliquer les permissions nécessaires pour l'utilisateur 'www-data'
+RUN chown -R www-data:www-data /app

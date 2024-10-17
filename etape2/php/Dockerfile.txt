@@ -1,0 +1,14 @@
+# Utilise l'image PHP-FPM en version 8.1 comme base
+FROM php:8.1-fpm
+
+# Installation de l'extension mysqli pour les interactions avec la base de données
+RUN docker-php-ext-install mysqli
+
+# Définir le répertoire de travail par défaut pour le container
+WORKDIR /app
+
+# Copier le fichier PHP qui va interagir avec la base de données dans le répertoire de travail
+COPY test_bdd.php .
+
+# Appliquer les bonnes permissions pour l'utilisateur 'www-data' sur le répertoire de travail
+RUN chown -R www-data:www-data /app

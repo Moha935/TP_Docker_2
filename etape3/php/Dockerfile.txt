@@ -1,0 +1,16 @@
+# Utiliser l'image officielle PHP-FPM version 8.1 comme image de base
+FROM php:8.1-fpm
+
+# Installer les extensions requises pour la connexion à la base de données
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Définir le répertoire de travail à l'intérieur du conteneur
+WORKDIR /var/www/html
+
+# Télécharger la dernière version de WordPress et l'extraire
+RUN curl -O https://wordpress.org/latest.tar.gz && \
+    tar -xvzf latest.tar.gz --strip-components=1 && \
+    rm latest.tar.gz  # Supprimer l'archive après extraction pour gagner de l'espace
+
+# Appliquer les permissions nécessaires pour l'utilisateur 'www-data'
+RUN chown -R www-data:www-data /var/www/html
