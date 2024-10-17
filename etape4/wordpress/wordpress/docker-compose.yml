@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  http:
+    image: nginx:alpine  # Utiliser l'image Nginx légère basée sur Alpine
+    container_name: nginx  # Nom du conteneur
+    ports:
+      - "8080:80"  # Rediriger le port 80 du conteneur vers le port 8080 de l'hôte
+    volumes:
+      - ./wordpress:/var/www/html  # Lier le répertoire local WordPress au conteneur
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf  # Charger la configuration Nginx personnalisée
+    depends_on:
+      - php  # Assurer que le conteneur PHP démarre avant Nginx
+    networks:
+      - wordpress-network  # Utiliser le réseau défini pour la communication entre conteneurs
+
+  php:
+    image: php:8.1-fpm  # Utiliser l'image PHP-FPM en version 8.1
+    container_name: php-fpm  # Nom du conteneur PHP
+    volumes:
+      - ./wordpress:/var/www/html  # Lier le même répertoire WordPress au conteneur PHP
+    networks:
+      - wordpress-network  # Connexion au réseau pour les services
+
+  db:
+    image: mysql:5.7  # Utiliser l'image MySQL version 5.7
+    container_name: mysql  # Nom du conteneur de base de données
+    restart: always  # Redémarrer le conteneur automatiquement en cas de panne
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Mot de passe pour l'utilisateur root
+      MYSQL_DATABASE: wordpress  # Nom de la base de données à créer
+      MYSQL_USER: user  # Nom de l'utilisateur pour la base de données
+      MYSQL_PASSWORD: userpassword  # Mot de passe pour l'utilisateur
+    volumes:
+      - db_data:/var/lib/mysql  # Lien vers le volume de données MySQL
+    networks:
+      - wordpress-network  # Connexion au réseau pour les services
+
+networks:
+  wordpress-network:
+    driver: bridge  # Utiliser le pilote de réseau en mode pont
+
+volumes:
+  db_data:  # Définir un volume pour persister les données de la base de données
